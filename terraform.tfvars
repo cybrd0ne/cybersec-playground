@@ -13,7 +13,7 @@ private_subnet1_cidr = "10.0.2.0/24"
 private_subnet2_cidr = "10.0.3.0/24"
 
 # IMPORTANT: Change this to your specific IP address for security
-management_cidr = "YOUR_PUBLIC_IP/32"  # e.g., "203.0.113.1/32"
+management_cidr = "52.49.35.232/32"  # e.g., "203.0.113.1/32"
 
 # Instance Configuration
 pfsense_instance_type = "t3.medium"     # Minimum recommended for pfSense
