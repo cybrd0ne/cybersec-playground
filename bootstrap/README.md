@@ -59,35 +59,38 @@ aws sts get-caller-identity
 Your AWS user/role needs these permissions:
 ```json
 {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "ec2:*",
-                "vpce:*",
-                "iam:CreateRole",
-                "iam:DeleteRole",
-                "iam:AttachRolePolicy",
-                "iam:DetachRolePolicy",
-                "iam:PutRolePolicy",
-                "iam:DeleteRolePolicy",
-                "s3:CreateBucket",
-                "s3:DeleteBucket",
-                "s3:PutBucketPolicy",
-                "s3:PutBucketVersioning",
-                "s3:PutEncryptionConfiguration",
-                "dynamodb:CreateTable",
-                "dynamodb:DeleteTable",
-                "secretsmanager:CreateSecret",
-                "secretsmanager:DeleteSecret",
-                "secretsmanager:PutSecretValue",
-                "ssm:PutParameter",
-                "ssm:DeleteParameter"
-            ],
-            "Resource": "*"
-        }
-    ]
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Effect": "Allow",
+			"Action": [
+				"ec2:*",
+				"vpce:*",
+				"iam:CreateRole",
+				"iam:DeleteRole",
+				"iam:AttachRolePolicy",
+				"iam:DetachRolePolicy",
+				"iam:PutRolePolicy",
+				"iam:DeleteRolePolicy",
+				"iam:TagRole",
+				"s3:CreateBucket",
+				"s3:DeleteBucket",
+				"s3:PutBucketPolicy",
+				"s3:PutBucketVersioning",
+				"s3:PutEncryptionConfiguration",
+				"dynamodb:CreateTable",
+				"dynamodb:DeleteTable",
+				"dynamodb:TagResource",
+				"secretsmanager:CreateSecret",
+				"secretsmanager:DeleteSecret",
+				"secretsmanager:PutSecretValue",
+				"secretsmanager:TagResource",
+				"ssm:PutParameter",
+				"ssm:DeleteParameter"
+			],
+			"Resource": "*"
+		}
+	]
 }
 ```
 
