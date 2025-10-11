@@ -65,7 +65,7 @@ Your AWS user/role needs these permissions:
             "Effect": "Allow",
             "Action": [
                 "ec2:*",
-                "vpc:*",
+                "vpce:*",
                 "iam:CreateRole",
                 "iam:DeleteRole",
                 "iam:AttachRolePolicy",
@@ -76,7 +76,7 @@ Your AWS user/role needs these permissions:
                 "s3:DeleteBucket",
                 "s3:PutBucketPolicy",
                 "s3:PutBucketVersioning",
-                "s3:PutBucketEncryption",
+                "s3:PutEncryptionConfiguration",
                 "dynamodb:CreateTable",
                 "dynamodb:DeleteTable",
                 "secretsmanager:CreateSecret",
