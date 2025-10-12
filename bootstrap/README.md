@@ -27,13 +27,14 @@ This comprehensive bootstrap system sets up your AWS cybersecurity lab infrastru
 
 ### Required Software
 ```bash
+# This is a sample manual install, use your preferred method
 # AWS CLI
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
 sudo ./aws/install
 
-# Terraform
-curl -fsSL https://releases.hashicorp.com/terraform/1.6.0/terraform_1.6.0_linux_amd64.zip -o terraform.zip
+# Terraform >= 1.11.0 due S3 state lock
+curl -fsSL https://releases.hashicorp.com/terraform/1.13.3/terraform_1.13.3_linux_amd64.zip -o terraform.zip
 unzip terraform.zip
 sudo mv terraform /usr/local/bin/
 
@@ -59,35 +60,47 @@ aws sts get-caller-identity
 Your AWS user/role needs these permissions:
 ```json
 {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "ec2:*",
-                "vpce:*",
-                "iam:CreateRole",
-                "iam:DeleteRole",
-                "iam:AttachRolePolicy",
-                "iam:DetachRolePolicy",
-                "iam:PutRolePolicy",
-                "iam:DeleteRolePolicy",
-                "s3:CreateBucket",
-                "s3:DeleteBucket",
-                "s3:PutBucketPolicy",
-                "s3:PutBucketVersioning",
-                "s3:PutEncryptionConfiguration",
-                "dynamodb:CreateTable",
-                "dynamodb:DeleteTable",
-                "secretsmanager:CreateSecret",
-                "secretsmanager:DeleteSecret",
-                "secretsmanager:PutSecretValue",
-                "ssm:PutParameter",
-                "ssm:DeleteParameter"
-            ],
-            "Resource": "*"
-        }
-    ]
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Effect": "Allow",
+			"Action": [
+				"ec2:*",
+				"vpce:*",
+				"iam:GetRole",
+				"iam:CreateRole",
+				"iam:DeleteRole",
+				"iam:TagRole",
+				"iam:AttachRolePolicy",
+				"iam:DetachRolePolicy",
+				"iam:PutRolePolicy",
+				"iam:DeleteRolePolicy",
+				"iam:ListRolePolicies",
+				"iam:ListAttachedRolePolicies",
+				"iam:ListInstanceProfilesForRole",
+				"s3:CreateBucket",
+				"s3:DeleteBucket",
+				"s3:PutBucketPolicy",
+				"s3:PutBucketVersioning",
+				"s3:PutEncryptionConfiguration",
+				"secretsmanager:CreateSecret",
+				"secretsmanager:DeleteSecret",
+				"secretsmanager:PutSecretValue",
+				"secretsmanager:TagResource",
+				"secretsmanager:DescribeSecret",
+				"secretsmanager:GetSecretValue",
+				"secretsmanager:GetResourcePolicy",
+				  "ssm:PutParameter",
+                "ssm:DeleteParameter",
+                "ssm:GetParameter",
+                "ssm:GetParameter",
+                "ssm:DescribeParameters",
+                "ssm:AddTagsToResource",
+                "ssm:ListTagsForResource"
+			],
+			"Resource": "*"
+		}
+	]
 }
 ```
 
