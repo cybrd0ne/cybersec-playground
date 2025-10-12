@@ -100,7 +100,11 @@ Your AWS user/role requires the following permissions:
 ### 1. Clone Repository
 ```bash
 git clone https://github.com/cybrd0ne/cybersec-playground.git
-cd cybersec-playground 
+cd cybersec-playground
+mkdir projects
+cd projects
+mkdir `your project`
+cd `your `project`
 ```
 
 ### 2. Create SSH Key Pair
