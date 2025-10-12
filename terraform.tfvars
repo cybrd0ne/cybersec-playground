@@ -26,7 +26,7 @@ key_pair_name = "your-key-pair-name"
 
 # Active Directory Configuration
 domain_name = "cybersec.local"
-domain_admin_password = "ComplexPassword123!"  # Use a strong password
+#domain_admin_password = "ComplexPassword123!"  # Use a strong password
 
 # Additional Notes:
 # 1. Make sure to create an EC2 Key Pair before running terraform
