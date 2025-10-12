@@ -1,4 +1,4 @@
-# AWS Cybersecurity Lab Infrastructure
+# Cybersecurity Playground Infrastructure
 
 [![Terraform](https://img.shields.io/badge/Terraform-v1.0+-623CE4?style=flat&logo=terraform)](https://www.terraform.io/)
 [![AWS](https://img.shields.io/badge/AWS-Cloud-orange?style=flat&logo=amazon-aws)](https://aws.amazon.com/)
@@ -7,6 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A comprehensive Terraform-based AWS infrastructure for cybersecurity training and penetration testing exercises. This lab environment provides a realistic, segmented network architecture with vulnerable applications and enterprise services for hands-on security education.
+Using boostrap process multiple projects can be created using separate config files.
 
 ## 🏗️ Architecture Overview
 
@@ -98,14 +99,14 @@ Your AWS user/role requires the following permissions:
 
 ### 1. Clone Repository
 ```bash
-git clone https://github.com/your-username/aws-cybersec-lab-terraform.git
-cd aws-cybersec-lab-terraform
+git clone https://github.com/cybrd0ne/cybersec-playground.git
+cd cybersec-playground 
 ```
 
 ### 2. Create SSH Key Pair
 ```bash
 aws ec2 create-key-pair \
-  --key-name cybersec-lab-key \
+  --key-name cybersec-playground-key \
   --query 'KeyMaterial' \
   --output text > ~/.ssh/cybersec-lab-key.pem
 chmod 400 ~/.ssh/cybersec-lab-key.pem
@@ -129,8 +130,8 @@ terraform apply
 ### terraform.tfvars Example
 ```hcl
 # AWS Configuration
-aws_region = "us-east-1"
-environment = "cybersec-lab"
+aws_region = "eu-west-1"
+environment = "cybersec-playground"
 owner = "security-team"
 
 # Network Configuration
@@ -149,11 +150,11 @@ dc_instance_type = "t3.medium"
 client_instance_type = "t3.small"
 
 # Access Configuration
-key_pair_name = "cybersec-lab-key"
+key_pair_name = "cybersec-playground-key"
 
 # Active Directory Configuration
 domain_name = "cybersec.local"
-domain_admin_password = "ComplexPassword123!"
+# domain_admin_password = "ChangeMe or use boostrap and AWS Secrets Manager!"
 ```
 
 ### Infrastructure Components
@@ -283,8 +284,8 @@ Test-NetConnection -ComputerName cybersec.local -Port 389
 terraform destroy
 
 # Verify all resources are deleted
-aws ec2 describe-instances --filters "Name=tag:Project,Values=CybersecurityLab"
-aws ec2 describe-vpcs --filters "Name=tag:Environment,Values=cybersec-lab"
+aws ec2 describe-instances --filters "Name=tag:Project,Values=CybersecurityPlayground"
+aws ec2 describe-vpcs --filters "Name=tag:Environment,Values=cybersec-playground"
 ```
 
 ## 💰 Cost Optimization
@@ -386,9 +387,9 @@ This infrastructure is designed for educational and testing purposes only. The d
 
 ## 📞 Support
 
-- **Issues**: [GitHub Issues](https://github.com/your-username/aws-cybersec-lab-terraform/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/your-username/aws-cybersec-lab-terraform/discussions)
-- **Documentation**: [Project Wiki](https://github.com/your-username/aws-cybersec-lab-terraform/wiki)
+- **Issues**: [GitHub Issues](https://github.com/cybrd0ne/cybersec-playground/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/cybrd0ne/cybersec-playground/discussions)
+- **Documentation**: [Project Docs](https://github.com/cybrd0ne/cybersec-playground/docs)
 
 ---
 
