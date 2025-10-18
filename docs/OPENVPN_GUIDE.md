@@ -47,23 +47,13 @@ The bootstrap now requires additional Secrets Manager permissions:
 
 ### 1. Bootstrap with VPN Support
 ```bash
-# Download all enhanced files
-# Replace the original files with enhanced versions:
-# - enhanced-pfsense-config.sh → modules/pfsense/scripts/pfsense-config.sh
-# - enhanced-pfsense-main.tf → modules/pfsense/main.tf
-# - enhanced-pfsense-variables.tf → modules/pfsense/variables.tf
-# - enhanced-pfsense-outputs.tf → modules/pfsense/outputs.tf
-# - enhanced-security-main.tf → modules/security/main.tf
-# - enhanced-security-outputs.tf → modules/security/outputs.tf
-# - enhanced-bootstrap-*.tf → bootstrap/
-
-# Run enhanced bootstrap
-./bootstrap-enhanced.sh
+# Run bootstrap
+./bootstrap/bootstrap.sh
 ```
 
 ### 2. Deploy with VPN Configuration
 ```bash
-cd aws-cybersec-lab
+cd projects/aws-cybersec-lab
 ./deploy.sh
 ```
 
@@ -180,34 +170,34 @@ openvpn --config vpnuser.ovpn --auth-user-pass vpnuser-credentials.txt
 #### JuiceShop Application
 ```bash
 # Direct access to vulnerable web app
-http://10.0.2.10:3000
+http://10.0.2.20:3000
 
 # No port forwarding needed through pfSense
-curl http://10.0.2.10:3000
+curl http://10.0.2.20:3000
 ```
 
 #### Windows Active Directory
 ```bash
 # RDP to Domain Controller
 rdesktop 10.0.3.10
-mstsc /v:10.0.3.10  # Windows
+mstsc /v:10.0.3.30  # Windows
 
 # RDP to Windows Client
 rdesktop 10.0.3.20
 mstsc /v:10.0.3.20  # Windows
 
 # DNS resolution works
-nslookup cybersec.local 10.0.3.10
+nslookup cybersec.local 10.0.3.30
 ```
 
 #### pfSense Management
 ```bash
 # Internal management interface
-https://10.0.2.1   # LAN1 interface
-https://10.0.3.1   # LAN2 interface
+https://10.0.2.10   # LAN1 interface
+https://10.0.3.10   # LAN2 interface
 
 # SSH to pfSense (internal)
-ssh admin@10.0.2.1
+ssh admin@10.0.2.10
 ```
 
 ## 🔒 Security Features
