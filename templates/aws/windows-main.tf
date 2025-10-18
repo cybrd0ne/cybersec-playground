@@ -9,12 +9,12 @@ resource "aws_instance" "domain_controller" {
   
   vpc_security_group_ids = [var.windows_sg_id]
   
-  private_ip = "10.0.3.10"
+  private_ip = "10.0.3.30"
   
   user_data = base64encode(templatefile("${path.module}/scripts/dc-setup.ps1", {
     domain_name           = var.domain_name
     domain_admin_password = var.domain_admin_password
-    pfsense_ip           = "10.0.3.1"
+    pfsense_ip           = "10.0.3.10"
   }))
 
   tags = {
@@ -38,7 +38,7 @@ resource "aws_instance" "windows_client" {
     domain_name           = var.domain_name
     domain_controller_ip  = "10.0.3.10"
     domain_admin_password = var.domain_admin_password
-    pfsense_ip           = "10.0.3.1"
+    pfsense_ip           = "10.0.3.10"
   }))
 
   tags = {

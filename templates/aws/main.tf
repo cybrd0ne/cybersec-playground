@@ -45,7 +45,7 @@ data "aws_ami" "pfsense" {
   
   filter {
     name   = "name"
-    values = ["pfSense-CE-2.7*"]
+    values = ["pfSense-plus-ec2*"]
   }
   
   filter {

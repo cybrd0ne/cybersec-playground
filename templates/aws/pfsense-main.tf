@@ -14,7 +14,7 @@ resource "aws_network_interface" "pfsense_wan" {
 
 resource "aws_network_interface" "pfsense_lan1" {
   subnet_id       = var.private_subnet1_id
-  private_ips     = ["10.0.2.1"]
+  private_ips     = ["10.0.2.10"]
   security_groups = [var.pfsense_sg_id]
   source_dest_check = false
 
@@ -25,7 +25,7 @@ resource "aws_network_interface" "pfsense_lan1" {
 
 resource "aws_network_interface" "pfsense_lan2" {
   subnet_id       = var.private_subnet2_id
-  private_ips     = ["10.0.3.1"]
+  private_ips     = ["10.0.3.10"]
   security_groups = [var.pfsense_sg_id]
   source_dest_check = false
 
@@ -72,8 +72,8 @@ resource "aws_instance" "pfsense" {
 
   user_data = base64encode(templatefile("${path.module}/scripts/pfsense-config.sh", {
     wan_ip    = "10.0.1.10"
-    lan1_ip   = "10.0.2.1" 
-    lan2_ip   = "10.0.3.1"
+    lan1_ip   = "10.0.2.10" 
+    lan2_ip   = "10.0.3.10"
     wan_gw    = "10.0.1.1"
   }))
 

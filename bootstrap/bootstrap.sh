@@ -13,59 +13,103 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration variables
-PROJECT_NAME="projects/${CYBERSEC_PLAYGROUND_PROJECT:aws-cybersec-lab}"
+PROJECT_NAME="${CYBERSEC_PLAYGROUND_PROJECT:-aws-cybersec-lab}"
 AWS_REGION="${CYBERSEC_PLAYGROUND_AWS_REGION:-eu-west-1}"
 KEY_PAIR_NAME="${CYBERSEC_PLAYGROUND_KEY_PAIR_NAME:-cybersec-playground-key}"
 DOMAIN_ADMIN_PASSWORD="${CYBERSEC_PLAYGROUND_DOMAIN_ADMIN_PASSWORD:-}"
 DOMAIN_NAME="${CYBERSEC_PLAYGROUND_DOMAIN_NAME:-cybersec.local}"
 MANAGEMENT_IP="${CYBERSEC_PLAYGROUND_MANAGEMENT_IP:-}"
-OWNER="${CYBERSEC_PLAYGROUND_OWNER:$(whoami)}
+OWNER="${CYBERSEC_PLAYGROUND_OWNER:-$(whoami)}"
 
 # File mapping for organizing Terraform files
-declare -A FILE_MAPPING=(
-    # Bootstrap files
-    ["bootstrap-main.tf"]="bootstrap/main.tf"
-    ["bootstrap-variables.tf"]="bootstrap/variables.tf"
-    ["bootstrap-outputs.tf"]="bootstrap/outputs.tf"
-    
-    # Main files (use updated versions with Secrets Manager)
-    ["main.tf"]="main.tf"
-    ["variables.tf"]="variables.tf"
-    ["outputs.tf"]="outputs.tf"
-    
-    # Network module
-    ["network-main.tf"]="modules/network/main.tf"
-    ["network-variables.tf"]="modules/network/variables.tf"
-    ["network-outputs.tf"]="modules/network/outputs.tf"
-    
-    # Security module
-    ["security-main.tf"]="modules/security/main.tf"
-    ["security-variables.tf"]="modules/security/variables.tf"
-    ["security-outputs.tf"]="modules/security/outputs.tf"
-    
-    # pfSense module
-    ["pfsense-main.tf"]="modules/pfsense/main.tf"
-    ["pfsense-variables.tf"]="modules/pfsense/variables.tf"
-    ["pfsense-outputs.tf"]="modules/pfsense/outputs.tf"
-    ["pfsense-config.sh"]="modules/pfsense/scripts/pfsense-config.sh"
-    
-    # JuiceShop module
-    ["juiceshop-main.tf"]="modules/juiceshop/main.tf"
-    ["juiceshop-variables.tf"]="modules/juiceshop/variables.tf"
-    ["juiceshop-outputs.tf"]="modules/juiceshop/outputs.tf"
-    ["juiceshop-setup.sh"]="modules/juiceshop/scripts/juiceshop-setup.sh"
-    
-    # Windows module
-    ["windows-main.tf"]="modules/windows/main.tf"
-    ["windows-variables.tf"]="modules/windows/variables.tf"
-    ["windows-outputs.tf"]="modules/windows/outputs.tf"
-    ["windows-dc-setup.ps1"]="modules/windows/scripts/dc-setup.ps1"
-    ["windows-client-setup.ps1"]="modules/windows/scripts/client-setup.ps1"
-    
-    # Documentation
-    ["README.md"]="README.md"
-    ["DEPLOYMENT_GUIDE.md"]="docs/DEPLOYMENT_GUIDE.md"
+FILE_MAPPING_KEYS=(
+	# Bootstrap files
+	"bootstrap-main.tf"
+	"bootstrap-variables.tf"
+	"bootstrap-outputs.tf"
+	# Main files (use updated versions with Secrets Manager)
+	"main.tf"
+	"variables.tf"
+	"outputs.tf"
+	# Network module
+	"network-main.tf"
+	"network-variables.tf"
+	"network-outputs.tf"
+	# Security module
+	"security-main.tf"
+	"security-variables.tf"
+	"security-outputs.tf"
+	# pfSense module
+	"pfsense-main.tf"
+	"pfsense-variables.tf"
+	"pfsense-outputs.tf"
+	"pfsense-config.sh"
+	# JuiceShop module
+	"juiceshop-main.tf"
+	"juiceshop-variables.tf"
+	"juiceshop-outputs.tf"
+	"juiceshop-setup.sh"
+	# Windows module
+	"windows-main.tf"
+	"windows-variables.tf"
+	"windows-outputs.tf"
+	"windows-dc-setup.ps1"
+	"windows-client-setup.ps1"
+	# Documentation
+	"README.md"
+	"DEPLOYMENT_GUIDE.md"
 )
+
+FILE_MAPPING_VALUES=(
+	# Bootstrap files
+	"bootstrap/main.tf"
+	"bootstrap/variables.tf"
+	"bootstrap/outputs.tf"
+	# Main files (updated versions with Secrets Manager)
+	"main.tf"
+	"variables.tf"
+	"outputs.tf"
+	# Network module
+	"modules/network/main.tf"
+	"modules/network/variables.tf"
+	"modules/network/outputs.tf"
+	# Security module
+	"modules/security/main.tf"
+	"modules/security/variables.tf"
+	"modules/security/outputs.tf"
+	# pfSense module
+	"modules/pfsense/main.tf"
+	"modules/pfsense/variables.tf"
+	"modules/pfsense/outputs.tf"
+	"modules/pfsense/scripts/pfsense-config.sh"
+	# JuiceShop module
+	"modules/juiceshop/main.tf"
+	"modules/juiceshop/variables.tf"
+	"modules/juiceshop/outputs.tf"
+	"modules/juiceshop/scripts/juiceshop-setup.sh"
+	# Windows module
+	"modules/windows/main.tf"
+	"modules/windows/variables.tf"
+	"modules/windows/outputs.tf"
+	"modules/windows/scripts/dc-setup.ps1"
+	"modules/windows/scripts/client-setup.ps1"
+	# Documentation
+	"README.md"
+	"docs/DEPLOYMENT_GUIDE.md"
+)
+
+get_file_mapping() {
+  local key="$1"
+  for i in "${!FILE_MAPPING_KEYS[@]}"; do
+    if [[ "${FILE_MAPPING_KEYS[i]}" == "$key" ]]; then
+      echo "${FILE_MAPPING_VALUES[i]}"
+      return 0
+    fi
+  done
+  echo ""
+  return 1
+}
+
 
 # Function to print colored output
 print_status() {
@@ -91,7 +135,7 @@ get_public_ip() {
         MANAGEMENT_IP=$(curl -s https://api.ipify.org 2>/dev/null || curl -s https://icanhazip.com 2>/dev/null | tr -d '\n')
         if [ -n "$MANAGEMENT_IP" ]; then
             print_success "Detected public IP: $MANAGEMENT_IP"
-            read -p "Use this IP for management access? (y/N): " -n 1 -r
+            read -p "Use this IP for management access? \(y/N\): " -n 1 -r
             echo
             if [[ ! $REPLY =~ ^[Yy]$ ]]; then
                 read -p "Enter your public IP address: " MANAGEMENT_IP
@@ -155,11 +199,34 @@ generate_password() {
 
 # Function to create directory structure
 create_directory_structure() {
+    print_status "Boostrap basename: $(dirname "$0")"
+    # Define a marker file or condition that identifies the expected directory
+    marker="templates"
+
+    # Check if the marker exists in the current directory
+    if [[ -d "$marker" ]]; then
+        print_status "Working in current directory: $(pwd)"
+    else
+	if [[ "$(dirname "$0")" == "." ]]; then
+            print_warning "Marker not found in $(pwd). Going up one level."
+            cd ..
+            print_status "Now in: $(pwd)"
+        else
+            print_warning "Directory $marker does not exists. No folder to copy initial terraform configuration!  "
+            read -p "Continue? \(y/N\): " -n 1 -r
+            echo
+            if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                print_status "Operation cancelled."
+                exit 0
+            fi
+        fi
+    fi
+    
     print_status "Creating project directory structure..."
     
-    if [ -d "$PROJECT_NAME" ]; then
-        print_warning "Directory $PROJECT_NAME already exists. Contents may be overwritten."
-        read -p "Continue? (y/N): " -n 1 -r
+    if [ -d "projects/$PROJECT_NAME" ]; then
+        print_warning "Directory projects/$PROJECT_NAME already exists. Contents may be overwritten."
+        read -p "Continue? \(y/N\): " -n 1 -r
         echo
         if [[ ! $REPLY =~ ^[Yy]$ ]]; then
             print_status "Operation cancelled."
@@ -168,7 +235,6 @@ create_directory_structure() {
     fi
     
     local dirs=(
-        "projects"
         "${PROJECT_NAME}"
         "${PROJECT_NAME}/bootstrap"
         "${PROJECT_NAME}/modules/network"
@@ -181,10 +247,7 @@ create_directory_structure() {
     )
     
     for dir in "${dirs[@]}"; do
-	mkdir -p "projects"
-	cd "projects"
-        mkdir -p "$dir"
-	cd ../
+        mkdir -p "projects/$dir"
     done
     
     print_success "Directory structure created"
@@ -196,25 +259,27 @@ organize_terraform_files() {
     
     local files_moved=0
     local missing_files=()
+    local source_folder="templates/aws"
     
-    for source_file in "${!FILE_MAPPING[@]}"; do
-        local target_path="${PROJECT_NAME}/${FILE_MAPPING[$source_file]}"
-        
-        if [ -f "$source_file" ]; then
+    for source_file in "${FILE_MAPPING_KEYS[@]}"; do
+	local target_path_value=$(get_file_mapping "$source_file")
+	local target_path="projects/${PROJECT_NAME}/${target_path_value}"
+
+        if [ -f "$source_folder/$source_file" ]; then
             # Create target directory if it doesn't exist
             mkdir -p "$(dirname "$target_path")"
             
             # Move and rename the file
-            cp templates/aws/"$source_file" "$target_path"
+            cp "$source_folder/$source_file" "$target_path"
             files_moved=$((files_moved + 1))
-            print_status "Moved: $source_file → ${FILE_MAPPING[$source_file]}"
+            print_status "Moved: $source_file → $target_path"
         else
             missing_files+=("$source_file")
         fi
     done
     
-    if [ templates/aws/${#missing_files[@]} -ne 0 ]; then
-        print_warning "Missing files (will need to be added manually):"
+    if [ "${#missing_files[@]}" -ne 0 ]; then
+        print_warning "Missing files \(will need to be added manually\):"
         for file in "${missing_files[@]}"; do
             echo "  - $file"
         done
@@ -228,8 +293,8 @@ make_scripts_executable() {
     print_status "Making scripts executable..."
     
     local script_files=(
-        "${PROJECT_NAME}/modules/pfsense/scripts/pfsense-config.sh"
-        "${PROJECT_NAME}/modules/juiceshop/scripts/juiceshop-setup.sh"
+        "projects/${PROJECT_NAME}/modules/pfsense/scripts/pfsense-config.sh"
+        "projects/${PROJECT_NAME}/modules/juiceshop/scripts/juiceshop-setup.sh"
     )
     
     for script in "${script_files[@]}"; do
@@ -253,16 +318,16 @@ create_key_pair() {
     
     local key_material=$(aws ec2 create-key-pair \
         --key-name "$KEY_PAIR_NAME" \
-        --key-type rsa \
+        --key-type ed25519 \
         --key-format pem \
         --region "$AWS_REGION" \
         --query 'KeyMaterial' \
         --output text)
     
     if [ $? -eq 0 ]; then
-        echo "$key_material" > "${PROJECT_NAME}/${KEY_PAIR_NAME}.pem"
-        chmod 400 "${PROJECT_NAME}/${KEY_PAIR_NAME}.pem"
-        print_success "Key pair created and saved to ${PROJECT_NAME}/${KEY_PAIR_NAME}.pem"
+        echo "$key_material" > "projects/${PROJECT_NAME}/${KEY_PAIR_NAME}.pem"
+        chmod 400 "projects/${PROJECT_NAME}/${KEY_PAIR_NAME}.pem"
+        print_success "Key pair created and saved to projects/${PROJECT_NAME}/${KEY_PAIR_NAME}.pem"
     else
         print_error "Failed to create EC2 Key Pair"
         exit 1
@@ -273,7 +338,7 @@ create_key_pair() {
 deploy_bootstrap_resources() {
     print_status "Deploying bootstrap Terraform resources..."
     
-    cd "${PROJECT_NAME}/bootstrap"
+    cd "projects/${PROJECT_NAME}/bootstrap"
     
     # Create bootstrap terraform.tfvars
     cat > terraform.tfvars <<EOF
@@ -290,7 +355,7 @@ EOF
     print_status "Planning bootstrap deployment..."
     terraform plan
     
-    read -p "Deploy bootstrap resources? (y/N): " -n 1 -r
+    read -p "Deploy bootstrap resources? \(y/N\): " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         print_status "Deploying bootstrap resources. This may take a few minutes..."
@@ -329,18 +394,16 @@ create_main_config() {
     # Get bootstrap outputs
     local secret_arn=$(cd bootstrap && terraform output -raw domain_password_secret_arn 2>/dev/null || echo "")
     local s3_bucket=$(cd bootstrap && terraform output -raw terraform_state_bucket 2>/dev/null || echo "")
-    local dynamodb_table=$(cd bootstrap && terraform output -raw terraform_lock_table 2>/dev/null || echo "")
     
     # Create backend configuration
-    if [ -n "$s3_bucket" ] && [ -n "$dynamodb_table" ]; then
+    if [ -n "$s3_bucket" ]; then
         cat > backend.tf <<EOF
 # Terraform Backend Configuration
 terraform {
   backend "s3" {
     bucket         = "$s3_bucket"
-    key            = "cybersec-lab/terraform.tfstate"
+    key            = "terraform.tfstate"
     region         = "$AWS_REGION"
-    dynamodb_table = "terraform-lock"
     encrypt        = true
     use_lockfile   = true
   }
@@ -380,7 +443,6 @@ domain_password_secret_arn = "$secret_arn"
 
 # Bootstrap Resources (for reference)
 terraform_state_bucket = "$s3_bucket"
-terraform_lock_table = "$dynamodb_table"
 EOF
     
     print_success "Main configuration created with Secrets Manager integration"
@@ -572,8 +634,8 @@ display_summary() {
     echo "========================================"
     echo
     echo "📁 Project Structure:"
-    echo "   $PROJECT_NAME/"
-    echo "   ├── projects/            # Projects using Terraform config"
+    echo "   projects/            # Projects using Terraform config"
+    echo "   |-$PROJECT_NAME/"
     echo "   ├── bootstrap/           # Bootstrap Terraform config"
     echo "   ├── modules/             # Main infrastructure modules"
     echo "   ├── *.tf                 # Main Terraform files"
@@ -583,7 +645,7 @@ display_summary() {
     echo "   └── ${KEY_PAIR_NAME}.pem # EC2 Key Pair (keep secure!)"
     echo
     echo "🚀 Next Steps:"
-    echo "   1. cd $PROJECT_NAME"
+    echo "   1. cd projects/$PROJECT_NAME"
     echo "   2. Review terraform.tfvars (especially management_cidr)"
     echo "   3. Run: ./deploy.sh"
     echo
@@ -592,7 +654,7 @@ display_summary() {
     echo "   • Management access limited to: ${MANAGEMENT_IP}/32"
     echo "   • EC2 key pair saved as ${KEY_PAIR_NAME}.pem"
     echo
-    echo "💰 Cost Estimate: ~$90/month while running"
+    echo "💰 Cost Estimate: ~\$90/month while running"
     echo "   • Use ./cleanup.sh to destroy resources when done"
     echo
     echo "📚 Documentation:"
@@ -608,7 +670,6 @@ main() {
     echo -e "${BLUE}🔧 AWS Cybersecurity Lab Bootstrap 🔧${NC}"
     echo "========================================"
     echo
-    
     check_prerequisites
     get_public_ip
     generate_password
@@ -621,7 +682,7 @@ main() {
         create_main_config
     else
         print_warning "Continuing without bootstrap deployment"
-        cd "$PROJECT_NAME"
+        cd "projects/$PROJECT_NAME"
         create_basic_config
         cd ..
     fi

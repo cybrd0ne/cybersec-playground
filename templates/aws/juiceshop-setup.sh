@@ -63,7 +63,7 @@ echo "JuiceShop deployment completed at $(date)" | sudo tee /var/log/juiceshop/d
 sleep 5
 if sudo docker ps | grep -q juice-shop; then
     echo "JuiceShop is running successfully!"
-    echo "Access it at http://10.0.2.10:3000"
+    echo "Access it at http://10.0.2.20:3000"
 else
     echo "Warning: JuiceShop may not be running properly"
     sudo docker logs juice-shop
