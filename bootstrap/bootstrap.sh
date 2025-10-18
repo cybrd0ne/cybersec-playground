@@ -477,7 +477,7 @@ key_pair_name = "$KEY_PAIR_NAME"
 
 # Active Directory Configuration
 domain_name = "$DOMAIN_NAME"
-domain_admin_password = "$DOMAIN_ADMIN_PASSWORD"  # TODO: Move to Secrets Manager
+# domain_admin_password = "$DOMAIN_ADMIN_PASSWORD" # Risky since the password is not in the Secrete Manageer
 EOF
 }
 
@@ -510,7 +510,7 @@ print_warning() {
     echo -e "${YELLOW}[WARNING]${NC} $1"
 }
 
-print_warning "This will deploy AWS resources that incur costs (~$90/month)"
+print_warning "This will deploy AWS resources that incur costs (~\$90/month)"
 print_warning "Make sure you understand the costs before proceeding"
 echo
 
@@ -604,7 +604,7 @@ terraform destroy
 
 if [ -d "bootstrap" ]; then
     echo
-    read -p "Also destroy bootstrap resources (S3, DynamoDB, Secrets)? (y/N): " -n 1 -r
+    read -p "Also destroy bootstrap resources (S3, Secrets)? (y/N): " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         print_status "Destroying bootstrap resources..."

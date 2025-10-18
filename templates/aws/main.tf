@@ -41,11 +41,16 @@ locals {
 # Get the latest pfSense Plus AMI
 data "aws_ami" "pfsense" {
   most_recent = true
-  owners      = ["aws-marketplace"]
+  owners      = ["679593333241"]
   
   filter {
     name   = "name"
     values = ["pfSense-plus-ec2*"]
+  }
+  
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
   }
   
   filter {
@@ -57,11 +62,16 @@ data "aws_ami" "pfsense" {
 # Get the latest Amazon Linux 2023 AMI for JuiceShop
 data "aws_ami" "amazon_linux" {
   most_recent = true
-  owners      = ["amazon"]
+  owners      = ["137112412989"]
   
   filter {
     name   = "name"
-    values = ["al2023-ami-*-x86_64"]
+    values = ["al2023-ami-*-x86_64-*"]
+  }
+  
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
   }
   
   filter {
@@ -73,11 +83,16 @@ data "aws_ami" "amazon_linux" {
 # Get the latest Windows Server 2022 AMI
 data "aws_ami" "windows_server" {
   most_recent = true
-  owners      = ["amazon"]
+  owners      = ["801119661308"]
   
   filter {
     name   = "name"
     values = ["Windows_Server-2022-English-Full-Base-*"]
+  }
+  
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
   }
   
   filter {

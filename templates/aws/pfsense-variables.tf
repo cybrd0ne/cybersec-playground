@@ -1,4 +1,4 @@
-# pfSense Module Variables
+# Enhanced pfSense Module Variables
 
 variable "vpc_id" {
   description = "ID of the VPC"
@@ -53,4 +53,40 @@ variable "pfsense_sg_id" {
 variable "environment" {
   description = "Environment name"
   type        = string
+}
+
+variable "aws_region" {
+  description = "AWS region for resources"
+  type        = string
+  default     = "us-east-1"
+}
+
+# OpenVPN Configuration Variables
+variable "vpn_port" {
+  description = "OpenVPN server port"
+  type        = number
+  default     = 1194
+}
+
+variable "vpn_protocol" {
+  description = "OpenVPN protocol (udp or tcp)"
+  type        = string
+  default     = "udp"
+  
+  validation {
+    condition     = contains(["udp", "tcp"], var.vpn_protocol)
+    error_message = "VPN protocol must be either 'udp' or 'tcp'."
+  }
+}
+
+variable "vpn_subnet" {
+  description = "OpenVPN client subnet"
+  type        = string
+  default     = "10.8.0.0/24"
+}
+
+variable "enable_vpn_logging" {
+  description = "Enable detailed OpenVPN logging"
+  type        = bool
+  default     = true
 }

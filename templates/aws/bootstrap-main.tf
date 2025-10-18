@@ -37,6 +37,23 @@ resource "random_string" "suffix" {
   special = false
 }
 
+# Generate secure VPN password
+resource "random_password" "vpn_password" {
+  length  = 20
+  lower   = true
+  upper   = true
+  numeric = true
+  special = true
+  min_lower   = 3
+  min_upper   = 3
+  min_numeric = 3
+  min_special = 2
+  
+  # Ensure compatibility with OpenVPN
+  override_special = "!@#$%^&*"
+}
+
+
 # Current AWS caller identity
 data "aws_caller_identity" "current" {}
 
@@ -81,7 +98,7 @@ resource "aws_s3_bucket_public_access_block" "terraform_state" {
 
 # AWS Secrets Manager Secret for Domain Administrator Password
 resource "aws_secretsmanager_secret" "domain_admin_password" {
-  name                    = "${var.project_name}/domain-admin-password"
+  name                    = "${var.project_name}/domain-admin-password-${random_string.suffix.result}"
   description             = "Domain Administrator password for Active Directory"
   recovery_window_in_days = 0  # For lab environment, allow immediate deletion
 
@@ -101,9 +118,37 @@ resource "aws_secretsmanager_secret_version" "domain_admin_password" {
   })
 }
 
+# AWS Secrets Manager Secret for OpenVPN Credentials
+resource "aws_secretsmanager_secret" "vpn_credentials" {
+  name                    = "${var.project_name}/vpn-credentials-${random_string.suffix.result}"
+  description             = "OpenVPN credentials for pfSense remote access"
+  recovery_window_in_days = 0  # For lab environment, allow immediate deletion
+
+  tags = {
+    Name        = "${var.project_name}-vpn-credentials"
+    Description = "OpenVPN user credentials for remote access"
+    Component   = "pfSense"
+  }
+}
+
+resource "aws_secretsmanager_secret_version" "vpn_credentials" {
+  secret_id     = aws_secretsmanager_secret.vpn_credentials.id
+  secret_string = jsonencode({
+    username = var.vpn_username
+    password = random_password.vpn_password.result
+    server   = "openvpn-server"
+    port     = var.vpn_port
+    protocol = var.vpn_protocol
+    type     = "vpn_user"
+    subnet   = "10.8.0.0/24"
+    encryption = "AES-256-GCM"
+    authentication = "SHA-256"
+  })
+}
+
 # IAM Role for Terraform Execution
 resource "aws_iam_role" "terraform_execution" {
-  name = "${var.project_name}-terraform-execution-role"
+  name = "${var.project_name}-terraform-execution-role-${random_string.suffix.result}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -184,7 +229,10 @@ resource "aws_iam_role_policy" "terraform_execution" {
           "secretsmanager:GetSecretValue",
           "secretsmanager:DescribeSecret"
         ]
-        Resource = aws_secretsmanager_secret.domain_admin_password.arn
+        Resource = [
+	  aws_secretsmanager_secret.domain_admin_password.arn,
+	  aws_secretsmanager_secret.vpn_credentials.arn
+	]
       },
       # S3 State Backend Permissions
       {
@@ -215,7 +263,7 @@ resource "aws_iam_role_policy" "terraform_execution" {
 
 # SSM Parameter for Terraform Role ARN (for easy reference)
 resource "aws_ssm_parameter" "terraform_role_arn" {
-  name  = "/${var.project_name}/terraform-role-arn"
+  name  = "/${var.project_name}/terraform-role-arn-${random_string.suffix.result}"
   type  = "String"
   value = aws_iam_role.terraform_execution.arn
 
@@ -237,3 +285,25 @@ resource "aws_ssm_parameter" "state_bucket" {
   }
 }
 
+# SSM Parameters for Secret ARNs (for easy reference)
+resource "aws_ssm_parameter" "domain_secret_arn" {
+  name  = "/${var.project_name}/domain-secret-arn"
+  type  = "String"
+  value = aws_secretsmanager_secret.domain_admin_password.arn
+
+  tags = {
+    Name        = "${var.project_name}-domain-secret-arn"
+    Description = "ARN of domain administrator password secret"
+  }
+}
+
+resource "aws_ssm_parameter" "vpn_secret_arn" {
+  name  = "/${var.project_name}/vpn-secret-arn"
+  type  = "String"
+  value = aws_secretsmanager_secret.vpn_credentials.arn
+
+  tags = {
+    Name        = "${var.project_name}-vpn-secret-arn"
+    Description = "ARN of VPN credentials secret"
+  }
+}

@@ -1,9 +1,9 @@
-# Security Groups Module - Define firewall rules for each component
+# Enhanced Security Groups Module - Include OpenVPN support
 
-# Security Group for pfSense Firewall
+# Security Group for pfSense Firewall with OpenVPN support
 resource "aws_security_group" "pfsense" {
   name        = "${var.environment}-pfsense-sg"
-  description = "Security group for pfSense firewall"
+  description = "Security group for pfSense firewall with OpenVPN"
   vpc_id      = var.vpc_id
 
   # SSH access from management network
@@ -29,6 +29,33 @@ resource "aws_security_group" "pfsense" {
     description = "HTTP Management"
     from_port   = 80
     to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = [var.management_cidr]
+  }
+
+  # OpenVPN UDP port
+  ingress {
+    description = "OpenVPN UDP"
+    from_port   = 1194
+    to_port     = 1194
+    protocol    = "udp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # OpenVPN TCP port (alternative)
+  ingress {
+    description = "OpenVPN TCP"
+    from_port   = 1194
+    to_port     = 1194
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Additional OpenVPN management port
+  ingress {
+    description = "OpenVPN Management"
+    from_port   = 7505
+    to_port     = 7505
     protocol    = "tcp"
     cidr_blocks = [var.management_cidr]
   }
@@ -274,5 +301,51 @@ resource "aws_security_group" "windows" {
 
   tags = {
     Name = "${var.environment}-windows-sg"
+  }
+}
+
+# Additional Security Group for VPN Clients
+resource "aws_security_group" "vpn_clients" {
+  name        = "${var.environment}-vpn-clients-sg"
+  description = "Security group for OpenVPN clients accessing internal resources"
+  vpc_id      = var.vpc_id
+
+  # Allow VPN clients to access internal resources
+  ingress {
+    description = "VPN Client Access"
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["10.8.0.0/24"]  # OpenVPN client subnet
+  }
+
+  ingress {
+    description = "VPN Client UDP Access"
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "udp"
+    cidr_blocks = ["10.8.0.0/24"]  # OpenVPN client subnet
+  }
+
+  # ICMP for VPN clients
+  ingress {
+    description = "VPN Client ICMP"
+    from_port   = -1
+    to_port     = -1
+    protocol    = "icmp"
+    cidr_blocks = ["10.8.0.0/24"]  # OpenVPN client subnet
+  }
+
+  # Outbound rules
+  egress {
+    description = "All Outbound"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.environment}-vpn-clients-sg"
   }
 }
