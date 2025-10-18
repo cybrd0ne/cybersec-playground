@@ -38,8 +38,8 @@ Using boostrap process multiple projects can be created using separate config fi
 │  │             │       │             │                     │
 │  │┌───────────┐│       │┌───────────┐│                     │
 │  ││JuiceShop  ││       ││Windows DC ││                     │
-│  ││Docker     ││       ││10.0.3.10  ││                     │
-│  ││10.0.2.10  ││       │└───────────┘│                     │
+│  ││Docker     ││       ││10.0.3.30  ││                     │
+│  ││10.0.2.20  ││       │└───────────┘│                     │
 │  │└───────────┘│       │┌───────────┐│                     │
 │  └─────────────┘       ││Windows    ││                     │
 │                        ││Client     ││                     │
@@ -165,9 +165,9 @@ domain_name = "cybersec.local"
 
 | Component | Instance Type | Private IP | Purpose |
 |-----------|---------------|------------|---------|
-| pfSense Firewall | t3.medium | 10.0.1.10 (WAN)<br>10.0.2.1 (LAN1)<br>10.0.3.1 (LAN2) | Network segmentation and security |
-| JuiceShop Server | t3.small | 10.0.2.10 | Vulnerable web application |
-| Domain Controller | t3.medium | 10.0.3.10 | Active Directory services |
+| pfSense Firewall | t3.medium | 10.0.1.10 (WAN)<br>10.0.2.10 (LAN1)<br>10.0.3.10 (LAN2) | Network segmentation and security |
+| JuiceShop Server | t3.small | 10.0.2.20 | Vulnerable web application |
+| Domain Controller | t3.medium | 10.0.3.30 | Active Directory services |
 | Windows Client | t3.small | 10.0.3.20 | Domain-joined workstation |
 
 ### Security Groups
@@ -205,12 +205,12 @@ domain_name = "cybersec.local"
    ```
 
 ### JuiceShop Access
-- **Internal Access**: http://10.0.2.10:3000
+- **Internal Access**: http://10.0.2.20:3000
 - **External Access**: http://<pfsense-public-ip>:8080 (after port forwarding)
 - **Docker Management**: SSH to JuiceShop server for container management
 
 ### Windows Active Directory
-- **Domain Controller**: RDP to 10.0.3.10 through pfSense port forwarding
+- **Domain Controller**: RDP to 10.0.3.30 through pfSense port forwarding
 - **Client Access**: RDP to 10.0.3.20 through pfSense port forwarding
 - **Domain Management**: Use Active Directory Users and Computers
 
