@@ -31,7 +31,6 @@ output "setup_summary" {
   value = {
     # Core Infrastructure
     state_bucket      = aws_s3_bucket.terraform_state.bucket
-    lock_table        = aws_dynamodb_table.terraform_lock.name
     terraform_role    = aws_iam_role.terraform_execution.name
     
     # Secrets Management
@@ -80,7 +79,6 @@ output "security_summary" {
       }
     }
     s3_encryption     = "AES256"
-    dynamodb_encryption = true
     backup_retention  = var.enable_backup_retention
   }
 }
@@ -92,7 +90,6 @@ output "connection_commands" {
     get_domain_password = "aws secretsmanager get-secret-value --secret-id ${aws_secretsmanager_secret.domain_admin_password.arn} --query SecretString --output text | jq -r '.password'"
     get_vpn_credentials = "aws secretsmanager get-secret-value --secret-id ${aws_secretsmanager_secret.vpn_credentials.arn} --query SecretString --output text | jq -r '.username, .password'"
     list_terraform_state = "aws s3 ls s3://${aws_s3_bucket.terraform_state.bucket}/"
-    check_terraform_lock = "aws dynamodb scan --table-name ${aws_dynamodb_table.terraform_lock.name}"
   }
 }
 
@@ -106,7 +103,6 @@ output "resource_arns" {
     terraform_role       = aws_iam_role.terraform_execution.arn
     ssm_terraform_role   = aws_ssm_parameter.terraform_role_arn.arn
     ssm_state_bucket     = aws_ssm_parameter.state_bucket.arn
-    ssm_lock_table       = aws_ssm_parameter.lock_table.arn
     ssm_domain_secret    = aws_ssm_parameter.domain_secret_arn.arn
     ssm_vpn_secret       = aws_ssm_parameter.vpn_secret_arn.arn
   }
