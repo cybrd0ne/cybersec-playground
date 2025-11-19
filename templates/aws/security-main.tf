@@ -112,7 +112,7 @@ resource "aws_security_group" "juiceshop" {
     from_port   = 3000
     to_port     = 3000
     protocol    = "tcp"
-    cidr_blocks = [var.vpc_cidr]
+    cidr_blocks = [var.vpc_cidr, "10.8.0.0/24"]
   }
 
   # SSH access from management network

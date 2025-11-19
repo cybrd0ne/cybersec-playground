@@ -15,10 +15,9 @@ try {
     # Configure network route through pfSense (optional, AWS handles routing)
     Write-Output "Configuring network routing..."
     try {
-        $routeExists = Get-NetRoute -DestinationPrefix "0.0.0.0/0" -ErrorAction SilentlyContinue
-        if (-not $routeExists) {
-            New-NetRoute -DestinationPrefix "0.0.0.0/0" -NextHop "${pfsense_ip}" -InterfaceAlias "Ethernet" -ErrorAction SilentlyContinue
-        }
+	Get-NetRoute -DestinationPrefix "0.0.0.0/0" -ErrorAction SilentlyContinue | Remove-NetRoute -Confirm:$false -ErrorAction SilentlyContinue
+        New-NetRoute -DestinationPrefix "0.0.0.0/0" -NextHop "${pfsense_ip}" -InterfaceAlias "Ethernet" -ErrorAction SilentlyContinue
+        Write-Output "Default route updated to use pfSense gateway: ${pfsense_ip}"
     } catch {
         Write-Warning "Could not configure custom route, using default AWS routing"
     }
@@ -37,8 +36,31 @@ try {
         throw "Failed to install AD-Domain-Services: $($installResult.ExitCode)"
     }
 
+    # Create a post-reboot script
+    $postRebootScript = @'
+# Your post-reboot commands here
+Import-Module ActiveDirectory
+New-ADUser -Name "Merk Vand" -SamAccountName "${username}" -AccountPassword (ConvertTo-SecureString "${password}" -AsPlainText -Force) -Enabled $true
+
+# Remove this scheduled task after running
+Unregister-ScheduledTask -TaskName "PostDCPromotionScript" -Confirm:$false
+'@
+
+    Set-Content -Path "C:\DCSetup\post-reboot.ps1" -Value $postRebootScript
+
+    # Create scheduled task to run at startup
+    $action = New-ScheduledTaskAction -Execute 'Powershell.exe' -Argument '-ExecutionPolicy Bypass -File C:\DCSetup\post-reboot.ps1'
+    $trigger = New-ScheduledTaskTrigger -AtStartup
+    $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
+    $principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
+
+    Register-ScheduledTask -TaskName "PostDCPromotionScript" -Action $action -Trigger $trigger -Settings $settings -Principal $principal
+
     # Prepare for domain promotion
+    # Set local Administrator password (will become domain Administrator password)
+    net user Administrator "${domain_admin_password}"
     Write-Output "Promoting server to Domain Controller..."
+    # Prepare safe mode password (DSRM password)
     $securePassword = ConvertTo-SecureString "${domain_admin_password}" -AsPlainText -Force
     
     # Import the ADDSDeployment module
@@ -55,7 +77,6 @@ try {
         -SysvolPath "C:\Windows\SYSVOL" `
         -SafeModeAdministratorPassword $securePassword `
         -InstallDns:$true `
-        -CreateDnsDelegation:$false `
         -NoRebootOnCompletion:$false `
         -Force:$true
 

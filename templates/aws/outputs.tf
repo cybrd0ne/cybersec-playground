@@ -1,4 +1,8 @@
 # Main Infrastructure Outputs
+output "aws_region" {
+  description = "AWS Configured Region"
+  value       = var.aws_region
+}
 
 output "vpc_id" {
   description = "ID of the VPC"
@@ -49,5 +53,7 @@ output "connection_info" {
     rdp_access        = "Configure port forwarding in pfSense for RDP to Windows machines"
     ssh_access        = "SSH through pfSense for Linux machines"
     domain_info       = "Domain: ${var.domain_name}, DC: ${module.windows_ad.domain_controller_private_ip}"
+    vpn_creds         = "ssh ${module.pfsense.pfsense_public_ip} -o RemoteCommand='cat /usr/local/etc/openvpn/client-configs/${var.vpn_username}-credentials.txt'"
+    vpn_config        = "Ready to be imported from your local folder in /tmp/${var.vpn_username}.ovpn"
   }
 }

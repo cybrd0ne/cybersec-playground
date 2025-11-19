@@ -29,11 +29,11 @@ resource "random_password" "vpn_password" {
 resource "aws_secretsmanager_secret_version" "vpn_credentials" {
   secret_id = aws_secretsmanager_secret.vpn_credentials.id
   secret_string = jsonencode({
-    username = "merk.vand"
+    username = var.vpn_username
     password = random_password.vpn_password.result
     server   = "openvpn-server"
-    port     = 1194
-    protocol = "udp"
+    port     = var.vpn_port
+    protocol = var.vpn_protocol
   })
 }
 
@@ -170,13 +170,17 @@ resource "aws_instance" "pfsense" {
     device_index         = 2
   }
 
-  user_data = base64encode(templatefile("${path.module}/scripts/pfsense-config.sh", {
+  user_data = base64gzip(templatefile("${path.module}/scripts/pfsense-config.sh", {
     wan_ip         = "10.0.1.10"
     lan1_ip        = "10.0.2.10" 
     lan2_ip        = "10.0.3.10"
     wan_gw         = "10.0.1.1"
     vpn_secret_arn = aws_secretsmanager_secret.vpn_credentials.arn
     aws_region     = var.aws_region
+    vpn_username   = var.vpn_username
+    vpn_port       = var.vpn_port
+    vpn_protocol   = var.vpn_protocol
+    fqdn   	   = var.fqdn
   }))
 
   # Additional storage for certificates and logs
@@ -214,4 +218,31 @@ resource "aws_route" "private2_default" {
   route_table_id         = var.private2_route_table_id
   destination_cidr_block = "0.0.0.0/0"
   network_interface_id   = aws_network_interface.pfsense_lan2.id
+}
+
+resource "null_resource" "run_pfsense_userdata" {
+  depends_on = [aws_instance.pfsense]
+
+  connection {
+    host        = aws_instance.pfsense.public_ip
+    user        = "admin"                # or your pfSense SSH user
+    agent	= true 
+    timeout     = "5m"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "chmod 400 /etc/motd-passwd",
+      "echo 'Downloading compressed user-data script...'",
+      "curl -s http://169.254.169.254/latest/user-data | gunzip -c > /tmp/pfsense-config.sh",
+      "chmod +x /tmp/pfsense-config.sh",
+      "echo 'Executing user-data script...'",
+      "/tmp/pfsense-config.sh > /dev/null",
+      "rm /tmp/pfsense-config.sh"
+    ]
+  }
+
+ provisioner "local-exec" {
+    command = "sleep 10;scp -o StrictHostKeyChecking=no -o LogLevel=quiet admin@${aws_instance.pfsense.public_ip}:/usr/local/etc/openvpn/client-configs/${var.vpn_username}.ovpn ~/Downloads/;ssh admin@${aws_instance.pfsense.public_ip} -o LogLevel=quiet -t 'cat /usr/local/etc/openvpn/client-configs/merk.vand-credentials.txt'"
+  }
 }

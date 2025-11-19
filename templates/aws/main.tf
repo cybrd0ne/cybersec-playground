@@ -66,7 +66,7 @@ data "aws_ami" "amazon_linux" {
   
   filter {
     name   = "name"
-    values = ["al2023-ami-*-x86_64-*"]
+    values = ["al2023-ami-*-x86_64"]
   }
   
   filter {
@@ -111,6 +111,8 @@ module "network" {
   private_subnet2_cidr = var.private_subnet2_cidr
   availability_zone    = data.aws_availability_zones.available.names[0]
   environment         = var.environment
+  pfsense_lan1_eni_id  = module.pfsense.lan1_eni_id
+  pfsense_lan2_eni_id  = module.pfsense.lan2_eni_id
 }
 
 module "security_groups" {
@@ -125,6 +127,7 @@ module "security_groups" {
 module "pfsense" {
   source = "./modules/pfsense"
   
+  aws_region		   = var.aws_region
   vpc_id                   = module.network.vpc_id
   public_subnet_id         = module.network.public_subnet_id
   private_subnet1_id       = module.network.private_subnet1_id
@@ -136,6 +139,8 @@ module "pfsense" {
   key_pair_name           = var.key_pair_name
   pfsense_sg_id           = module.security_groups.pfsense_sg_id
   environment             = var.environment
+  vpn_username		  = var.vpn_username
+  fqdn			  = var.fqdn
 }
 
 module "juiceshop" {

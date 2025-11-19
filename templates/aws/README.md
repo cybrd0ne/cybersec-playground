@@ -165,7 +165,7 @@ domain_name = "cybersec.local"
 
 | Component | Instance Type | Private IP | Purpose |
 |-----------|---------------|------------|---------|
-| pfSense Firewall | t3.medium | 10.0.1.10 (WAN)<br>10.0.2.1 (LAN1)<br>10.0.3.1 (LAN2) | Network segmentation and security |
+| pfSense Firewall | t3.medium | 10.0.1.10 (WAN)<br>10.0.2.10 (LAN1)<br>10.0.3.10 (LAN2) | Network segmentation and security |
 | JuiceShop Server | t3.small | 10.0.2.10 | Vulnerable web application |
 | Domain Controller | t3.medium | 10.0.3.10 | Active Directory services |
 | Windows Client | t3.small | 10.0.3.20 | Domain-joined workstation |
@@ -197,12 +197,7 @@ domain_name = "cybersec.local"
 1. **Access Web Interface**: `https://<pfsense-public-ip>`
 2. **Default Credentials**: admin/pfsense (change immediately)
 3. **Complete Setup Wizard**: Configure interfaces and basic settings
-4. **Configure Port Forwarding**: 
-   ```
-   External Port 8080 → 10.0.2.10:3000 (JuiceShop)
-   External Port 3389 → 10.0.3.10:3389 (DC RDP)
-   External Port 3390 → 10.0.3.20:3389 (Client RDP)
-   ```
+4. **Configure Port Forwarding**: WARNIG! This is a vulnerable environment, forward on your own ris
 
 ### JuiceShop Access
 - **Internal Access**: http://10.0.2.10:3000

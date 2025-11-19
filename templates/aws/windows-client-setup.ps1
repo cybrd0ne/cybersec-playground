@@ -34,10 +34,9 @@ try {
     # Configure network route through pfSense (optional, AWS handles routing)
     Write-Output "Configuring network routing..."
     try {
-        $routeExists = Get-NetRoute -DestinationPrefix "0.0.0.0/0" -ErrorAction SilentlyContinue
-        if (-not $routeExists) {
-            New-NetRoute -DestinationPrefix "0.0.0.0/0" -NextHop "${pfsense_ip}" -InterfaceAlias "Ethernet" -ErrorAction SilentlyContinue
-        }
+	Get-NetRoute -DestinationPrefix "0.0.0.0/0" -ErrorAction SilentlyContinue | Remove-NetRoute -Confirm:$false -ErrorAction SilentlyContinue
+        New-NetRoute -DestinationPrefix "0.0.0.0/0" -NextHop "${pfsense_ip}" -InterfaceAlias "Ethernet" -ErrorAction SilentlyContinue
+        Write-Output "Default route updated to use pfSense gateway: ${pfsense_ip}"
     } catch {
         Write-Warning "Could not configure custom route, using default AWS routing"
     }
@@ -63,6 +62,7 @@ try {
     } catch {
         Write-Warning "DNS test failed: $($_.Exception.Message)"
     }
+
 
     # Wait a bit more for AD to be fully ready
     Write-Output "Waiting additional time for Active Directory to be fully initialized..."

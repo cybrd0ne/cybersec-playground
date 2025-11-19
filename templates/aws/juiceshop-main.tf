@@ -9,6 +9,11 @@ resource "aws_instance" "juiceshop" {
   vpc_security_group_ids = [var.juiceshop_sg_id]
   
   private_ip = "10.0.2.20"
+
+  root_block_device {
+    volume_size = 4
+    volume_type = "gp3"
+  }
   
   user_data = base64encode(templatefile("${path.module}/scripts/juiceshop-setup.sh", {
     pfsense_ip = "10.0.2.10"

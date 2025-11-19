@@ -20,6 +20,8 @@ DOMAIN_ADMIN_PASSWORD="${CYBERSEC_PLAYGROUND_DOMAIN_ADMIN_PASSWORD:-}"
 DOMAIN_NAME="${CYBERSEC_PLAYGROUND_DOMAIN_NAME:-cybersec.local}"
 MANAGEMENT_IP="${CYBERSEC_PLAYGROUND_MANAGEMENT_IP:-}"
 OWNER="${CYBERSEC_PLAYGROUND_OWNER:-$(whoami)}"
+VPN_USERNAME="${CYBERSEC_PLAYGROUND_VPN_USERNAME:-cybersec-vpnuser}"
+FQDN="${CYBERSEC_PLAYGROUND_FQDN:-cybersec.local}"
 
 # File mapping for organizing Terraform files
 FILE_MAPPING_KEYS=(
@@ -192,7 +194,7 @@ generate_password() {
     if [ -z "$DOMAIN_ADMIN_PASSWORD" ]; then
         print_status "Generating secure domain administrator password..."
         # Generate a complex password that meets Windows requirements
-        DOMAIN_ADMIN_PASSWORD="CyberSec$(openssl rand -base64 20 | tr -d "=+/" | cut -c1-8)!"
+        DOMAIN_ADMIN_PASSWORD="CyberSec$(openssl rand -base64 20 | tr -d "=+/!" | cut -c1-8)!"
         print_success "Password generated. It will be stored securely in AWS Secrets Manager."
     fi
 }
@@ -347,6 +349,7 @@ project_name = "$PROJECT_NAME"
 key_pair_name = "$KEY_PAIR_NAME"
 domain_name = "$DOMAIN_NAME"
 domain_admin_password = "$DOMAIN_ADMIN_PASSWORD"
+vpn_username = "$VPN_USERNAME"
 EOF
     
     # Initialize and apply bootstrap
@@ -418,6 +421,7 @@ EOF
 aws_region = "$AWS_REGION"
 environment = "cybersec-playground"
 owner = "$OWNER"
+fqdn = "$FQDN"
 
 # Network Configuration
 vpc_cidr = "10.0.0.0/16"
@@ -427,6 +431,7 @@ private_subnet2_cidr = "10.0.3.0/24"
 
 # Security Configuration
 management_cidr = "${MANAGEMENT_IP}/32"
+vpn_username = "$VPN_USERNAME"
 
 # Instance Configuration
 pfsense_instance_type = "t3.medium"
@@ -465,6 +470,7 @@ private_subnet2_cidr = "10.0.3.0/24"
 
 # Security Configuration - UPDATE THIS TO YOUR IP!
 management_cidr = "${MANAGEMENT_IP}/32"
+vpn_username = "$VPN_USERNAME"
 
 # Instance Configuration
 pfsense_instance_type = "t3.medium"

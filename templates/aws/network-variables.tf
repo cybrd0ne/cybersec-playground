@@ -29,3 +29,13 @@ variable "environment" {
   description = "Environment name"
   type        = string
 }
+
+variable "pfsense_lan1_eni_id" {
+  description = "ENI ID of pfSense LAN1 interface for private subnet 1 routing"
+  type        = string
+}
+
+variable "pfsense_lan2_eni_id" {
+  description = "ENI ID of pfSense LAN2 interface for private subnet 2 routing"
+  type        = string
+}

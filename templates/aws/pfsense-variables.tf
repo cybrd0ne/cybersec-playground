@@ -62,6 +62,11 @@ variable "aws_region" {
 }
 
 # OpenVPN Configuration Variables
+variable "vpn_username" {
+  description = "OpenVPN username"
+  type        = string
+}
+
 variable "vpn_port" {
   description = "OpenVPN server port"
   type        = number

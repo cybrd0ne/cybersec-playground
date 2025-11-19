@@ -49,6 +49,11 @@ variable "management_cidr" {
   default     = "0.0.0.0/0"  # Change this to your specific IP for security
 }
 
+variable "vpn_username" {
+  description = "VPN username to create on the PfSense box"
+  type        = string
+}
+
 # Instance Configuration
 variable "pfsense_instance_type" {
   description = "Instance type for pfSense firewall"
@@ -59,7 +64,7 @@ variable "pfsense_instance_type" {
 variable "juiceshop_instance_type" {
   description = "Instance type for JuiceShop server"
   type        = string
-  default     = "t3.small"
+  default     = "t3.medium"
 }
 
 variable "dc_instance_type" {
@@ -103,4 +108,9 @@ variable "terraform_lock_table" {
   description = "DynamoDB table for Terraform state locking (created by bootstrap)"
   type        = string
   default     = ""
+}
+
+variable "fqdn" {
+  description = "FQDN to use on service creation"
+  type        = string
 }

@@ -33,10 +33,10 @@ resource "aws_instance" "windows_client" {
   vpc_security_group_ids = [var.windows_sg_id]
   
   private_ip = "10.0.3.20"
-  
+
   user_data = base64encode(templatefile("${path.module}/scripts/client-setup.ps1", {
     domain_name           = var.domain_name
-    domain_controller_ip  = "10.0.3.10"
+    domain_controller_ip  = "10.0.3.30"
     domain_admin_password = var.domain_admin_password
     pfsense_ip           = "10.0.3.10"
   }))

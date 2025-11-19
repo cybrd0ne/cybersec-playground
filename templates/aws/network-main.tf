@@ -71,22 +71,38 @@ resource "aws_route_table" "public" {
   }
 }
 
-# Route table for private subnet 1 (will be updated to route through pfSense)
+# Route table for private subnet 1
 resource "aws_route_table" "private1" {
   vpc_id = aws_vpc.main.id
-  
+
   tags = {
     Name = "${var.environment}-private1-rt"
   }
 }
 
-# Route table for private subnet 2 (will be updated to route through pfSense)
+# Route table for private subnet 2
 resource "aws_route_table" "private2" {
   vpc_id = aws_vpc.main.id
   
   tags = {
     Name = "${var.environment}-private2-rt"
   }
+}
+
+# Default route for private subnet 1 through pfSense LAN1 interface
+resource "aws_route" "private1_default_via_pfsense" {
+  route_table_id         = aws_route_table.private1.id
+  destination_cidr_block = "0.0.0.0/0"
+  network_interface_id   = var.pfsense_lan1_eni_id
+  depends_on             = [aws_route_table.private1]
+}
+
+# Default route for private subnet 2 through pfSense LAN2 interface
+resource "aws_route" "private2_default_via_pfsense" {
+  route_table_id         = aws_route_table.private2.id
+  destination_cidr_block = "0.0.0.0/0"
+  network_interface_id   = var.pfsense_lan2_eni_id
+  depends_on             = [aws_route_table.private2]
 }
 
 # Route table associations
