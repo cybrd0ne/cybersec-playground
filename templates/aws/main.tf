@@ -111,8 +111,8 @@ module "network" {
   private_subnet2_cidr = var.private_subnet2_cidr
   availability_zone    = data.aws_availability_zones.available.names[0]
   environment         = var.environment
-  pfsense_lan1_eni_id  = module.pfsense.lan1_eni_id
-  pfsense_lan2_eni_id  = module.pfsense.lan2_eni_id
+  pfsense_lan1_eni_id  = module.pfsense.pfsense_lan1.id
+  pfsense_lan2_eni_id  = module.pfsense.pfsense_lan2.id
 }
 
 module "security_groups" {
@@ -140,7 +140,7 @@ module "pfsense" {
   pfsense_sg_id           = module.security_groups.pfsense_sg_id
   environment             = var.environment
   vpn_username		  = var.vpn_username
-  fqdn			  = var.fqdn
+  lab_fqdn	          = var.lab_fqdn
 }
 
 module "juiceshop" {
@@ -166,4 +166,5 @@ module "windows_ad" {
   domain_name             = local.domain_credentials.domain  # Use domain from secret
   domain_admin_password   = local.domain_credentials.password  # Use password from secret
   environment             = var.environment
+  vpn_username		  = var.vpn_username
 }

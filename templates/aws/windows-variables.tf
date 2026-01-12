@@ -45,3 +45,14 @@ variable "environment" {
   description = "Environment name"
   type        = string
 }
+
+variable "vpn_username" {
+  description = "same windows user as OpenVPN username"
+  type        = string
+}
+
+variable "dummy_password" {
+  description = "weak password to introduce weak account into domain"
+  type        = string
+  default     = "ChangeMe"
+}

@@ -14,7 +14,7 @@ VPN_PASSWORD="THIS IS NOT THE PASSW0RD!JUST GLOBAL VAR;)"
 VPN_PORT="${vpn_port}"
 VPN_PROTOCOL="${vpn_protocol}"
 AWS_REGION="${aws_region}"
-FQDN="${fqdn}"
+FQDN="${lab_fqdn}"
 PYTHON_BIN="python3.11"
 
 log_message() {
@@ -32,7 +32,7 @@ log_message() {
 
 wait_for_system() {
   log_message INFO "Waiting for pfSense system to fully initialize..."
-  sleep 90
+  sleep 10
   attempts=0
   max_attempts=30
   while [ $attempts -lt $max_attempts ]; do

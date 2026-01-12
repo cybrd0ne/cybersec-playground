@@ -25,6 +25,16 @@ output "pfsense_lan2_ip" {
   value       = aws_network_interface.pfsense_lan2.private_ip
 }
 
+output "pfsense_lan1_eni_id" {
+  description = "LAN1 ENI ID of pfSense"
+  value       = aws_network_interface.pfsense_lan1.id
+}
+
+output "pfsense_lan2_eni_id" {
+  description = "LAN2 ENI ID of pfSense"
+  value       = aws_network_interface.pfsense_lan2.id
+}
+
 # OpenVPN Related Outputs
 output "vpn_server_endpoint" {
   description = "OpenVPN server endpoint for client connections"

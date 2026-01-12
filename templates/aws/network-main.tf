@@ -95,6 +95,9 @@ resource "aws_route" "private1_default_via_pfsense" {
   destination_cidr_block = "0.0.0.0/0"
   network_interface_id   = var.pfsense_lan1_eni_id
   depends_on             = [aws_route_table.private1]
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 # Default route for private subnet 2 through pfSense LAN2 interface
@@ -103,6 +106,9 @@ resource "aws_route" "private2_default_via_pfsense" {
   destination_cidr_block = "0.0.0.0/0"
   network_interface_id   = var.pfsense_lan2_eni_id
   depends_on             = [aws_route_table.private2]
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 # Route table associations
@@ -114,16 +120,18 @@ resource "aws_route_table_association" "public" {
 resource "aws_route_table_association" "private1" {
   subnet_id      = aws_subnet.private1.id
   route_table_id = aws_route_table.private1.id
+  depends_on = [aws_route.private1_default_via_pfsense]
 }
 
 resource "aws_route_table_association" "private2" {
   subnet_id      = aws_subnet.private2.id
   route_table_id = aws_route_table.private2.id
+  depends_on = [aws_route.private2_default_via_pfsense]
 }
 
 # DHCP Options Set for AD integration
 resource "aws_vpc_dhcp_options" "main" {
-  domain_name_servers = ["AmazonProvidedDNS"]
+  domain_name_servers = ["10.0.3.30","10.0.2.10"]
   domain_name         = "cybersec.local"
   
   tags = {

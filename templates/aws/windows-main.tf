@@ -4,7 +4,7 @@
 resource "aws_instance" "domain_controller" {
   ami           = var.windows_server_ami_id
   instance_type = var.dc_instance_type
-  key_name      = var.key_pair_name
+  key_name      = "${var.key_pair_name}-rsa"
   subnet_id     = var.private_subnet2_id
   
   vpc_security_group_ids = [var.windows_sg_id]
@@ -15,6 +15,8 @@ resource "aws_instance" "domain_controller" {
     domain_name           = var.domain_name
     domain_admin_password = var.domain_admin_password
     pfsense_ip           = "10.0.3.10"
+    username		 = var.vpn_username
+    password		 = var.dummy_password
   }))
 
   tags = {
@@ -27,7 +29,7 @@ resource "aws_instance" "domain_controller" {
 resource "aws_instance" "windows_client" {
   ami           = var.windows_server_ami_id
   instance_type = var.client_instance_type
-  key_name      = var.key_pair_name
+  key_name      = "${var.key_pair_name}-rsa"
   subnet_id     = var.private_subnet2_id
   
   vpc_security_group_ids = [var.windows_sg_id]
