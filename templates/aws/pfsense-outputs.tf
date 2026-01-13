@@ -15,6 +15,16 @@ output "pfsense_wan_private_ip" {
   value       = aws_network_interface.pfsense_wan.private_ip
 }
 
+output "pfsense_lan1" {
+  description = "LAN1 of pfSense"
+  value       = aws_network_interface.pfsense_lan1
+}
+
+output "pfsense_lan2" {
+  description = "LAN2 of pfSense"
+  value       = aws_network_interface.pfsense_lan2
+}
+
 output "pfsense_lan1_ip" {
   description = "LAN1 IP of pfSense"
   value       = aws_network_interface.pfsense_lan1.private_ip

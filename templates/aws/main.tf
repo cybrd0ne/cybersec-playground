@@ -140,7 +140,7 @@ module "pfsense" {
   pfsense_sg_id           = module.security_groups.pfsense_sg_id
   environment             = var.environment
   vpn_username		  = var.vpn_username
-  lab_fqdn	          = var.lab_fqdn
+  fqdn			  = var.fqdn
 }
 
 module "juiceshop" {

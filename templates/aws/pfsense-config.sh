@@ -14,7 +14,7 @@ VPN_PASSWORD="THIS IS NOT THE PASSW0RD!JUST GLOBAL VAR;)"
 VPN_PORT="${vpn_port}"
 VPN_PROTOCOL="${vpn_protocol}"
 AWS_REGION="${aws_region}"
-FQDN="${lab_fqdn}"
+FQDN="${fqdn}"
 PYTHON_BIN="python3.11"
 
 log_message() {
@@ -233,7 +233,6 @@ EOF
 
 cat << 'EOFCERT' | pfSsh.php
 require_once("config.inc");
-parse_config(true);
 global $config;
 
 // Import CA
@@ -241,6 +240,10 @@ $ca = array();
 $ca['refid'] = uniqid();
 $ca['descr'] = 'CyberSec-CA';
 $ca['crt'] = base64_encode(file_get_contents('/usr/local/etc/openvpn/keys/ca.crt'));
+
+if (!is_array($config['ca'])) {
+    $config['ca'] = array();
+}
 $config['ca'][] = $ca;
 
 // Import Server Certificate
@@ -250,9 +253,14 @@ $cert['descr'] = 'OpenVPN Server Certificate';
 $cert['caref'] = $ca['refid'];
 $cert['crt'] = base64_encode(file_get_contents('/usr/local/etc/openvpn/keys/server.crt'));
 $cert['prv'] = base64_encode(file_get_contents('/usr/local/etc/openvpn/keys/server.key'));
+
+if (!is_array($config['cert'])) {
+    $config['cert'] = array();
+}
 $config['cert'][] = $cert;
 
 write_config("Imported OpenVPN certificates");
+echo "Certificates imported successfully.\n";
 exit(0);
 exec
 EOFCERT
@@ -279,7 +287,6 @@ require_once("auth.inc");
 require_once("openvpn.inc");
 
 // Parse existing configuration
-parse_config(true);
 global \$config;
 
 // Initialize OpenVPN config arrays if not exists
@@ -423,8 +430,6 @@ log_message "Assigning OpenVPN interface..."
 cat << 'EOFPHP2' | pfSsh.php
 require_once("config.inc");
 require_once("interfaces.inc");
-
-parse_config(true);
 global $config;
 
 // Find the next available OPT interface slot
@@ -494,8 +499,6 @@ setup_vpn_user_auth() {
 cat << EOFPHP | pfSsh.php
 require_once("config.inc");
 require_once("auth.inc");
-
-parse_config(true);
 global \$config;
 
 // Create a SHA512 password hash (pfSense expects encrypted password)

@@ -95,3 +95,8 @@ variable "enable_vpn_logging" {
   type        = bool
   default     = true
 }
+
+variable "fqdn" {
+  description = "address to be used for pfSense setup"
+  type        = string
+}
